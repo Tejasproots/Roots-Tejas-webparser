@@ -69,40 +69,31 @@ query4 = []
 query4= [str(y)+":"+ x  for x in applications for y in queryrand]
 
 finalquery= []
-finalquery = query1 + query2 + query3 + query4
+finalquery = query1+query3 ##+ query2 + query4
 len(finalquery)
 
+
+#links = []
+#for q in finalquery:
+#    query= q 
+#    for j in search(query, num=1000, start=3, stop=1000, pause=(random.randint(5,20))):
+#        result = re.search('https(.*).com/',j) #Regex to look for for specific patterns "https.......com"
+#        
+#        time.sleep(random.randit(5,40))
+#        if result:
+#            id = result.group()              
+#            if id not in links:
+#                links.append(id) #if regex passed and value not already in list append to list
 
 links = []
 for q in finalquery:
     query= q 
-    for j in search(query, num=1000, start=3, stop=1000, pause=(random.randint(5,20))):
-        result = re.search('https(.*).com/',j) #Regex to look for for specific patterns "https.......com"
-        time.sleep(random.randit(5,40))
-        if result:
-            id = result.group()              
-            if id not in links:
-                links.append(id) #if regex passed and value not already in list append to list
-
-
-
-links = []
-for q in query1:
-    query= q 
     for j in search(query, num_results=3):
         result = re.search('https(.*).com/',j) #Regex to look for for specific patterns "https.......com"
+        
         time.sleep(random.randit(5,40))
         if result:
             id = result.group()              
             if id not in links:
                 links.append(id) #if regex passed and value not already in list append to list
-                
-query= "site:wix.com"
-for j in search(query, num_results=3):
-   ## requests.get(link, headers = {'User-agent': 'your bot 0.1'})
-    result = re.search('https(.*).com/',j) #Regex to look for for specific patterns "https.......com"
-    time.sleep(random.randit(5,40))
-    if result:
-        id = result.group()              
-        if id not in links:
-            links.append(id) #if regex passed and value not already in list append to list
+

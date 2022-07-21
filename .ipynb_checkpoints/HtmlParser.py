@@ -1,4 +1,3 @@
-from cmath import e
 from fileinput import filename
 import os
 import re
@@ -15,10 +14,6 @@ login_like_pages= []
 login_like_pages= df['url'].tolist()
 len(login_like_pages)
 
-if os.path.isdir('digitalvisionwebparser/')== True:
-    print("Directory Exist")
-else:
-    os.makedirs('digitalvisionwebparser/')
 
 #PATH =(r"C:\Users\TejasP\OneDrive - Roots Automation, Inc\Documents\chromedriver.exe")
 PATH =(r"C:\Users\TejasP\local_code_repo\DigitialVisionWebparser\chromedriver.exe")
@@ -34,12 +29,17 @@ if __name__ == "__main__":
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920,1080")
     # optional; reduces amount of info logged to console
-    chrome_options.add_argument("--log-level=3")
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    #chrome_options.add_argument("--log-level=3")
+    if os.path.isdir('digitalvisionwebparser/')== True:
+        print("Directory Exist")
+    else:
+        os.makedirs('digitalvisionwebparser/')
+    #driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
 
     for k in range(len(login_like_pages)):
         driver.get(login_like_pages[k])
-        fileno = fileno +1
+        driver.maximize_window()
+        fileno = fileno+1
         filename.append(k)
         mappingno.append(fileno)
         img_str = driver.get_screenshot_as_png()
@@ -53,6 +53,7 @@ if __name__ == "__main__":
         # radiobutton (<input type="radio">), checkbox (<input type="checkbox">), dateinput (<input type="date">)
         colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),(128, 255, 0),(0, 128, 0),(0, 0, 128)]
         mapping = {}
+        boundingboxes = []
         mapping["input"]="Input"
         mapping["img"]="Image"
         mapping["select"]="Dropdown"
@@ -61,7 +62,6 @@ if __name__ == "__main__":
         mapping["a"]="Text"
         mapping["span"]="Text"
         
-## Name + Screenshot + numpy files + 
         for j in range(len(values)):
 
             elements = driver.find_elements(by=By.TAG_NAME, value=values[j])
@@ -71,15 +71,18 @@ if __name__ == "__main__":
                 y1 = int(elements[i].rect['y'])
                 x2 = int(x1 + elements[i].rect['width'])
                 y2 = int(y1 + elements[i].rect['height'])
-                a = {'x1': x1, 'x2': x2,'y1': y1, 'y2': y2}
-                np.save('fileno.npy', a)
-                
-                cv2.rectangle(img, (x1, y1), (x2, y2), colors[j], 1)
-                cv2.putText(img,mapping[values[j]], (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
+                if x1==y1==x2==y2==0:
+                    ...
+                else:
+                    boundingboxes.append({'x1': x1, 'x2': x2,'y1': y1, 'y2': y2}) 
+                    cv2.rectangle(img, (x1, y1), (x2, y2), colors[j], 1)
+                    cv2.putText(img,mapping[values[j]], (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
 
-        cv2.imwrite(fileno+'.png'.format(k), img)
-        
+        cv2.imwrite("digitalvisionwebparser/"+str(fileno)+'.png'.format(k), img)
+        np.save("digitalvisionwebparser/"+str(fileno)+'.npy', boundingboxes)
+driver.quit()
+
 mapping= pd.DataFrame({'screenshotno':mappingno,
                   'numpyfileno':mappingno,
                   'urlname': filename
